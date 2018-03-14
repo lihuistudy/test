@@ -1,0 +1,174 @@
+<html>
+    
+    <head>
+    
+        <style>
+            .completed{
+                color: chartreuse;
+                font-weight: bold;
+            }
+            
+            ul{
+                list-style: none;
+                margin-left: -30px;
+            }
+            
+            a:link{
+                color: white;
+            }
+            a:visited{
+                color: white;
+            }
+            
+            .bg{
+                background-color: black;
+            }
+        
+        </style>
+    </head>
+    <body>
+    
+        <div id="app">
+        
+        </div>    
+    
+        
+        <script>
+            
+            //--------------------------------------------模型 Model---------------------------------------
+            var state = {
+                msg: 'Hello!',
+                color: '',
+                todos: [{
+                    id: '1',
+                    text: '购买一个帽子',
+                    isCompleted: false
+                },{
+                    id: '2',
+                    text: '扫一下地',
+                    isCompleted: true
+                },{
+                    id: '3',
+                    text: '买10个苹果',
+                    isCompleted: false
+                }],
+                curLabState: '全部'
+            }
+            
+            
+            
+            //----------------------------------------视图 View----------------------------------------
+            function render(){
+
+                //顶部-添加任务
+                let topElt = `<div>
+                                <input id='todo_text' type='text'/>
+                                <button id='btn'>添加任务</button>
+                              </div>`
+                
+
+                
+               
+                //中间-任务列表 
+                //拿到过滤以后的数据
+                let data = filterArr();
+                //for循环版
+//                let centerElt = "<ul id='todo_list'>";
+//                for(let i = 0; i < data.length; i++){
+//                    
+//                    let todo = data[i];
+//                    centerElt += `<li id=${todo.id} class='${todo.isCompleted ? 'completed' : '' }'>${todo.text}</li>`;
+//                    
+//                }
+//                centerElt += '</ul>'
+                
+                //map版
+                let centerElt = `<ul id='todo_list'>
+                                    ${
+                                        data.map((todo) => {
+                                            return `<li id=${todo.id} class='${todo.isCompleted ? 'completed' : '' }'>${todo.text}</li>`
+                                        }).join('')
+                                    }
+                                </ul>`
+                
+                
+                
+                
+                //底部
+                let bottomElt = `<div id='todo_select'>
+                                    <a class=${ state.curLabState == '全部' ? 'bg' : '' } href='#'>全部</a>
+                                    <a class=${ state.curLabState == '已完成' ? 'bg' : '' } href='#'>已完成</a>
+                                    <a class=${ state.curLabState == '未完成' ? 'bg' : '' } href='#'>未完成</a>
+                                </div>`
+
+                
+
+                app.innerHTML = topElt + centerElt + bottomElt;
+                //绑定事件
+                initEvt();
+            }
+            function initEvt(){
+                btn.onclick = clickBtn;
+                todo_list.addEventListener( 'click', changeTodo  , false );
+                todo_select.addEventListener('click', selectTodos);
+            }
+            
+            
+            //过滤以后的数据
+            function filterArr(){      
+                
+                switch(state.curLabState){
+                    case '全部':  return state.todos;
+                    case '已完成': return state.todos.filter( (todo) => {return todo.isCompleted} )
+                    case '未完成': return state.todos.filter( (todo) => {return !todo.isCompleted} )
+                }
+                
+            }
+            
+            
+            
+            
+            
+            //--------------------------------控制器 Controller (控制器有很多个！！)----------------------
+            function clickBtn(){
+                //把新的任务放进任务数组
+                let obj = {
+                    id: state.todos.length + 1 + '',
+                    text: todo_text.value,
+                    isCompleted: false
+                }
+                state.todos.push(obj);
+                //刷新界面
+                render();
+            }
+            
+            //点击改变任务状态
+            function changeTodo(){
+               
+                for(let todo of state.todos){
+                    if(todo.id == event.target.id){
+                        todo.isCompleted = !todo.isCompleted;
+                    }
+                }
+                
+                render();
+            }
+            
+            //切换任务（筛选任务）
+            function selectTodos(){
+                //阻止默认事件
+                event.preventDefault();
+                
+                //改变当前选中标签页
+                state.curLabState = event.target.innerHTML;
+                
+                render();
+            }
+
+            
+            render();
+        
+        </script>
+    </body>
+
+</html>
